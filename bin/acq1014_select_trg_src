@@ -1,0 +1,69 @@
+#!/bin/sh
+
+usage() {
+	echo acq1014_select_trg \{int\|ext\|ext2\} 
+	echo on master, ext2 selects ext1 as normal
+	exit 1
+}
+
+select_trg_source() {
+
+if [ $(acq1014_is_master) -eq 1 ]; then
+	case $1 in
+	int)
+		S1_TRGDX=d0
+	       # Must set HDMI Trigger Output Line to soft_trigger
+	        set.site 0 SIG:SYNC_OUT:TRG:DX d1;;
+	ext)
+		S1_TRGDX=d0
+        # Select d7 of the TRG bus, SYNC UFL becomes sync TRG OUT
+	        set.site 0 SIG:SYNC_OUT:TRG:DX d7;;
+	ext2)
+		S1_TRGDX=d7
+		echo ext2 TRG selected. OK. nb Master still uses TRG not TRG2
+		if [ "$(get.site 0 SIG:FP:CLK_SRC)" = "EXT_FP" ]; then
+			# do NOT try clock from the trigger ..
+			echo setting INT clk src
+			acq1014_select_clk_src int
+		fi
+	        set.site 0 SIG:SYNC_OUT:TRG:DX d7;;
+	*)
+		usage;;
+	esac
+else
+	case $1 in
+	ext2)
+		S1_TRGDX=d7;;
+	ext|int)
+		S1_TRGDX=d0;;
+	*)
+		usage;;
+	esac
+fi
+
+echo $1 > /etc/acq400/0/acq1014_trg_src
+sleep 2
+
+mode=$2
+edge=$3
+
+if [ "$mode" = "prepost" ]; then
+# soft trigger, hard event
+	set.site 1 TRG:SENSE rising
+	set.site 1 TRG:DX 1
+	set.site 1 TRG enable
+	set.site 1 EVENT0:SENSE $edge
+	set.site 1 EVENT0:DX $S1_TRGDX
+	set.site 1 EVENT0 enable
+else
+# hard trigger, no event
+	set.site 1 TRG:SENSE $edge
+	set.site 1 TRG:DX $S1_TRGDX
+	set.site 1 TRG enable
+	set.site 1 EVENT0 disable
+fi
+}
+
+select_trg_source ${1:-int} ${2:-post} ${3:-rising}
+
+

@@ -1,0 +1,41 @@
+#!/bin/sh
+
+#no auto soft trigger to avoid pair race
+sed -e 's/export ACQ400D_TRIG/#export ACQ400D_TRIG/' \
+	/usr/local/CARE/acq480_streamd.0.conf \
+	>/etc/sysconfig/acq400_streamd.0.conf
+	
+init_mb_clk() {
+	/usr/local/epics/scripts/wait_ioc_ready
+	sleep 2
+	/usr/local/bin/acq1014_select_clk_src int $1 25000000
+	caput $(hostname):ACQ1014:FS $1
+	caput $(hostname):ACQ1014:FIN 25000000
+	/usr/local/bin/acq1014_select_trg_src int
+}
+
+route_acq1014_specials() {
+# Set GPIO UFL as Output driven from d0 of Event Bus
+# only Master needs to do this, but in the special case of Slave Box,
+# we still need the control. On the Slave module, it goes nowhere
+	set.site 0 SIG:FP:GPIO EVT6
+	if [ $(acq1014_is_master) -eq 1 ]; then
+		echo ACQ1014 MASTER role detected
+
+
+# This is a routing internal to the SYSTEM_CONTROL_INTERFACE. See VHDL.
+		set.site 0 SIG:EVENT_SRC:6 MOD
+
+		# Push permanent 25 MHz Clock out of HDMI.
+		set.site 0 SIG:SYNC_OUT:CLK CLK
+		set.site 0 SIG:SYNC_OUT:CLK:DX d7
+
+# Push soft_trigger out of HDMI for internal trigger mode.
+		set.site 0 SIG:SYNC_OUT:TRG TRG
+		set.site 0 SIG:SYNC_OUT:TRG:DX d1
+	fi
+	
+}
+
+
+(init_mb_clk ${1:-40000000}; route_acq1014_specials) &

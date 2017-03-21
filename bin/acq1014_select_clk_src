@@ -1,0 +1,39 @@
+#!/bin/sh
+
+select_clk_source() {
+	case $1 in
+	ext)
+	# FP clock
+		set.site 0 SIG:FP:CLK_SRC EXT_FP
+		set.site 0 SYS:CLK:FPMUX FPCLK
+		if [ "x$3" = "x" ] || [ "$3" = "0" ]; then
+	# let external clock counter settle.
+			sleep 2
+		fi
+		fin=$3;;
+	int)
+	# RP clock
+		set.site 0 SIG:FP:CLK_SRC INT_RP
+		set.site 0 SYS:CLK:FPMUX FPCLK
+		fin=${3}
+		[ $fin -eq 0 ] && fin=25000000;;        
+	*)
+		echo ERROR must be int or ext
+		exit 1;;
+	esac
+	
+	set.site 0 SIG:CLK_MB:FIN $fin
+	set.site 0 SIG:CLK_MB:SET $2
+
+	if [ $fin -ne 0 ] && [ $2 -ne 0 ]; then
+		set.site 1 XDT $(echo $2 | awk '{ print 1e9/$1 }')
+	fi
+
+	set.site 1 CLK:SENSE falling
+	set.site 1 CLK:DX d1
+	set.site 1 CLK external
+	
+	echo $1 $2 $fin > /etc/acq400/0/acq1014_clk_src
+}
+
+select_clk_source ${1:-int} ${2:-50000000} ${3:-0}

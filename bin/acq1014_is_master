@@ -1,0 +1,9 @@
+#!/bin/sh
+iscon=$(get.site 0 SIG:SYNC_BUS:OUT:CABLE_DET|awk '{print $2}')
+
+if [ "x$iscon" = "xCONNECTED" ]; then
+	echo 1
+else
+	echo 0
+fi
+
