@@ -7,7 +7,7 @@ ln -s /usr/local/bin/set.fpmux /etc/acq400/0/fpmux
 ln -s /usr/local/bin/mb_clk /etc/acq400/0/mb_clk
 ln -s /usr/local/bin/acq1014_is_master  /usr/local/bin/acq1014_select_clk_src  /usr/local/bin/acq1014_select_trg_src /etc/acq400/0/
 echo int > /etc/acq400/0/acq1014_trg_src
-echo int > /etc/acq400/0/acq1014_clk_src
+echo "int 0 0" > /etc/acq400/0/acq1014_clk_src
 
 
 set.fpmux off
