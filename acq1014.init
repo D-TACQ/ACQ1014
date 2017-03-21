@@ -6,8 +6,8 @@ FMC_SCAN_FPGA=ACQ1014 FMC_SCAN_SITES="1 2" /usr/local/bin/fmc-scan
 ln -s /usr/local/bin/set.fpmux /etc/acq400/0/fpmux
 ln -s /usr/local/bin/mb_clk /etc/acq400/0/mb_clk
 ln -s /usr/local/bin/acq1014_is_master  /usr/local/bin/acq1014_select_clk_src  /usr/local/bin/acq1014_select_trg_src /etc/acq400/0/
-echo xxx > /etc/acq400/0/acq1014_trg_src
-echo xxx > /etc/acq400/0/acq1014_clk_src
+echo int > /etc/acq400/0/acq1014_trg_src
+echo int > /etc/acq400/0/acq1014_clk_src
 
 
 set.fpmux off
