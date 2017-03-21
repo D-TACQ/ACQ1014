@@ -1,9 +1,8 @@
 #!/bin/sh
-iscon=$(get.site 0 SIG:SYNC_BUS:OUT:CABLE_DET|awk '{print $2}')
 
-if [ "x$iscon" = "xCONNECTED" ]; then
-	echo 1
-else
-	echo 0
-fi
+MASTER=0
+[ -e /etc/acq400/2/MTYPE ] && [ "$(cat /etc/acq400/2/MTYPE) = "67" ] && MASTER=1
+
+echo $MASTER
+
 

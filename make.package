@@ -8,14 +8,13 @@ TOP=..
 
 rm -Rf opkg/*
 mkdir -p opkg/usr/local/bin \
-	opkg/usr/local/init 
+	opkg/usr/local/init \
 	opkg/usr/share
 
 cp bin/* opkg/usr/local/bin
 cp ${MODEL}_init_gpio opkg/usr/local/bin
 cp ${MODEL}.map   opkg/usr/local/
 cp ${MODEL}.init opkg/usr/local/init
-echo run make as regular user 
 cp -a doc opkg/usr/share
 
 tar czf release/${SEQ}-${MODEL}-${DC}.tgz -C opkg .

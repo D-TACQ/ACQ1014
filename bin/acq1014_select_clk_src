@@ -4,8 +4,7 @@ select_clk_source() {
 	case $1 in
 	ext)
 	# FP clock
-		set.site 0 SIG:FP:CLK_SRC EXT_FP
-		set.site 0 SYS:CLK:FPMUX FPCLK
+		if [ $(acq1014_is_master) ] && set.site 2 acq1014_clk=0;;
 		if [ "x$3" = "x" ] || [ "$3" = "0" ]; then
 	# let external clock counter settle.
 			sleep 2
@@ -13,10 +12,9 @@ select_clk_source() {
 		fin=$3;;
 	int)
 	# RP clock
-		set.site 0 SIG:FP:CLK_SRC INT_RP
-		set.site 0 SYS:CLK:FPMUX FPCLK
+		if [ $(acq1014_is_master) ] && set.site 2 acq1014_clk=1;;	
 		fin=${3}
-		[ $fin -eq 0 ] && fin=25000000;;        
+		[ $fin -eq 0 ] && fin=20000000;;        
 	*)
 		echo ERROR must be int or ext
 		exit 1;;

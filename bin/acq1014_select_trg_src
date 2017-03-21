@@ -1,45 +1,25 @@
 #!/bin/sh
 
 usage() {
-	echo acq1014_select_trg \{int\|ext\|ext2\} 
+	echo acq1014_select_trg \{int\|ext\} 
 	echo on master, ext2 selects ext1 as normal
 	exit 1
 }
 
+S1_TRGDX=d0
+
 select_trg_source() {
 
-if [ $(acq1014_is_master) -eq 1 ]; then
-	case $1 in
-	int)
-		S1_TRGDX=d0
-	       # Must set HDMI Trigger Output Line to soft_trigger
-	        set.site 0 SIG:SYNC_OUT:TRG:DX d1;;
-	ext)
-		S1_TRGDX=d0
-        # Select d7 of the TRG bus, SYNC UFL becomes sync TRG OUT
-	        set.site 0 SIG:SYNC_OUT:TRG:DX d7;;
-	ext2)
-		S1_TRGDX=d7
-		echo ext2 TRG selected. OK. nb Master still uses TRG not TRG2
-		if [ "$(get.site 0 SIG:FP:CLK_SRC)" = "EXT_FP" ]; then
-			# do NOT try clock from the trigger ..
-			echo setting INT clk src
-			acq1014_select_clk_src int
-		fi
-	        set.site 0 SIG:SYNC_OUT:TRG:DX d7;;
-	*)
-		usage;;
-	esac
-else
-	case $1 in
-	ext2)
-		S1_TRGDX=d7;;
-	ext|int)
-		S1_TRGDX=d0;;
-	*)
-		usage;;
-	esac
-fi
+case $1 in
+int)
+	[ $(acq1014_is_master) -eq 1 ] && set.site 2 acq1014_trg=1;;
+ext)
+	[ $(acq1014_is_master) -eq 1 ] && set.site 2 acq1014_trg=0;;
+rp)
+	;;
+*)
+	usage;;
+esac
 
 echo $1 > /etc/acq400/0/acq1014_trg_src
 sleep 2
