@@ -1,7 +1,7 @@
 #!/bin/sh
 
 MASTER=0
-[ -e /etc/acq400/2/MTYPE ] && [ "$(cat /etc/acq400/2/MTYPE) = "67" ] && MASTER=1
+[ -e /etc/acq400/2/MTYPE ] && [ "$(cat /etc/acq400/2/MTYPE)" = "67" ] && MASTER=1
 
 echo $MASTER
 
