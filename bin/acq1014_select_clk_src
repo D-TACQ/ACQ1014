@@ -4,7 +4,7 @@ select_clk_source() {
 	case $1 in
 	ext)
 	# FP clock
-		[ $(acq1014_is_master) ] && set.site 2 acq1014_clk=0
+		[ $(acq1014_is_master) -eq 1 ] && set.site 2 acq1014_clk=0
 		if [ "x$3" = "x" ] || [ "$3" = "0" ]; then
 	# let external clock counter settle.
 			sleep 2
@@ -12,7 +12,7 @@ select_clk_source() {
 		fin=$3;;
 	int)
 	# RP clock
-		[ $(acq1014_is_master) ] && set.site 2 acq1014_clk=1	
+		[ $(acq1014_is_master) -eq 1 ] && set.site 2 acq1014_clk=1	
 		fin=${3}
 		[ $fin -eq 0 ] && fin=20000000;;        
 	*)
